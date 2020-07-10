@@ -5,13 +5,12 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "simple_joint_state_pub");
 
-  ros::NodeHandle node;
+  ros::NodeHandle nodeHandler;
 
-  ros::Publisher joint_states_pub = node.advertise<sensor_msgs::JointState>("joint_states", 1000);
+  ros::Publisher joint_states_pub = nodeHandler.advertise<sensor_msgs::JointState>("joint_states", 20);
 
-  ros::Rate loop_rate(1);
+  ros::Rate loop_rate(10);
 
-  int count = 0;
   while(ros::ok())
   {
     sensor_msgs::JointState joint_states_message;
@@ -26,8 +25,8 @@ int main(int argc, char **argv)
  
     loop_rate.sleep();
 
-    ++count;
   }
 
   return 0;
 }
+

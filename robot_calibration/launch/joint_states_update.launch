@@ -5,3 +5,4 @@
    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
    <node name="simple_joint_state_pub_1" pkg="robot_calibration" type="simple_joint_state_pub" />
 </launch>
+
