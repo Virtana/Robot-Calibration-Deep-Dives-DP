@@ -22,10 +22,8 @@ int main(int argc, char **argv)
     joint_states_pub.publish(joint_states_message);
  
     ros::spinOnce();
- 
     loop_rate.sleep(); 
-  }
-  
+  } 
   return 0;
 }
 
