@@ -16,14 +16,14 @@ int main(int argc, char **argv)
     sensor_msgs::JointState joint_states_message;
 
     joint_states_message.name = {"base_to_link_1","link_1_to_link_2"};
-    joint_states_message.position = {0,0};
+    joint_states_message.position = {3,1};
     joint_states_message.header.stamp = ros::Time::now();
 
     joint_states_pub.publish(joint_states_message);
  
     ros::spinOnce();
  
-    loop_rate.sleep();
+    loop_rate.sleep(); 
   }
   
   return 0;
