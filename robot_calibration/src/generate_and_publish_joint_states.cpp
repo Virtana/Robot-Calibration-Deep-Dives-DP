@@ -2,6 +2,7 @@
 #include "sensor_msgs/JointState.h"
 #include <stdlib.h>
 #include <time.h>
+#include <cmath>
 
 int main(int argc, char **argv)
 {
@@ -27,8 +28,8 @@ int main(int argc, char **argv)
 
     joint_states_message.name = {"base_to_link_1","link_1_to_link_2"};
 
-    double theta1 = (double(rand()) / (double(RAND_MAX))) * 6.28;
-    double theta2 = (double(rand()) / (double(RAND_MAX))) * 6.28;
+    double theta1 = (double(rand()) / double(RAND_MAX)) * 2*M_PI;
+    double theta2 = (double(rand()) / double(RAND_MAX)) * 2*M_PI;
 
     joint_states_message.position = {theta1, theta2};
     joint_states_message.header.stamp = ros::Time::now();
