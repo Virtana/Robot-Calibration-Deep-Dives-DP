@@ -1,5 +1,7 @@
-state_update_interval: 1
-num_state_changes: 15
+robot_joint_angles:
+  state_update_interval: 5
+  num_state_changes: 25
+
 
 
 
