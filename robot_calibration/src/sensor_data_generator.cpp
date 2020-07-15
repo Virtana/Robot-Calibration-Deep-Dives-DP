@@ -1,16 +1,27 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
+#include <cmath>
+#include "yaml-cpp/yaml.h"
 
 
 void writeAngleData(const sensor_msgs::JointState:ConstPtr& msg)
 {
-  double angles[2] = msg->position;
+  double angles[] = msg->position;
+
+  double ee_position[] = {(1.8 * cos(angles[0])) + (1 * cos(angles[0] + angles[1])) , (1.8 * sin(angles[0])) + (1 * sin(angles[0] + angles[1]))}; //lengths currently hardcoded
   
-  for(double angle : angles)
-    angle += 0.44;
+  angles[0] += 6.44; //theta1 offset
+  angles[1] += 3.1; //theta2 offset
 
-  //need to write to file
+  YAML::Emitter yaml_out_stream;
+  
+  yaml_out_stream.open("sensor_readings.yaml");
 
+  yaml_out_stream << YAML::Flow;
+  yaml_out_stream << YAML::BeginSeq << angles/*[0] << angles[1]*/ << YAML::EndSeq;
+  yaml_out_stream << YAML::BeginSeq << ee_position/*[0] << ee_position[1] */<< YAML::EndSeq;
+  
+  yaml_out_stream.close();
 }
 
 int main(int argc, char** argv)
