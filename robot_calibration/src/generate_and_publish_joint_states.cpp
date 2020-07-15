@@ -8,15 +8,15 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "simple_joint_state_pub");
 
-  ros::NodeHandle node;
+  ros::NodeHandle nh;
 
-  ros::Publisher joint_states_pub = node.advertise<sensor_msgs::JointState>("joint_states", 20);
+  ros::Publisher joint_states_pub = nh.advertise<sensor_msgs::JointState>("joint_states", 20);
 
-  int num_messages;
-  node.param("num_messages", num_messages, 50);
+  int num_joint_changes;
+  nh.param("num_joint_changes", num_joint_changes, 50);
  
   double message_interval;
-  node.param("message_interval", message_interval, 0.1);
+  nh.param("message_interval", message_interval, 0.1);
   
   ros::Rate loop_rate(1/message_interval);
 
@@ -28,8 +28,8 @@ int main(int argc, char **argv)
 
     joint_states_message.name = {"base_to_link_1","link_1_to_link_2"};
 
-    double theta1 = (double(rand()) / double(RAND_MAX)) * 2*M_PI;
-    double theta2 = (double(rand()) / double(RAND_MAX)) * 2*M_PI;
+    double theta1 = -(double(rand()) / double(RAND_MAX)) * 2*M_PI;
+    double theta2 = -(double(rand()) / double(RAND_MAX)) * 2*M_PI;
 
     joint_states_message.position = {theta1, theta2};
     joint_states_message.header.stamp = ros::Time::now();
