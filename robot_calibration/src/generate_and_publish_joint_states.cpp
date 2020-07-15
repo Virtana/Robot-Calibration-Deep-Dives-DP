@@ -12,24 +12,36 @@ int main(int argc, char **argv)
 
   ros::Publisher joint_states_pub = nh.advertise<sensor_msgs::JointState>("joint_states", 20);
 
-  int num_joint_changes;
-  nh.param("num_joint_changes", num_joint_changes, 50);
+  int num_state_changes;
+  nh.param("num_state_changes", num_state_changes, 50);
  
-  double message_interval;
-  nh.param("message_interval", message_interval, 0.1);
+  int state_update_interval;
+  nh.param("state_update_interval", state_update_interval, 3);
   
-  ros::Rate loop_rate(1/message_interval);
+  ros::Rate loop_rate(10);
 
   int count = 0;
+
   srand(time(0));
-  while(ros::ok() && count < num_messages)
+  
+  double theta1 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
+  double theta2 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
+
+  time_t last_update_time = time(0);
+  
+  while(ros::ok() && count < num_state_changes)
   {
     sensor_msgs::JointState joint_states_message;
 
     joint_states_message.name = {"base_to_link_1","link_1_to_link_2"};
 
-    double theta1 = -(double(rand()) / double(RAND_MAX)) * 2*M_PI;
-    double theta2 = -(double(rand()) / double(RAND_MAX)) * 2*M_PI;
+    if(time(0) - last_update_time == state_update_interval)
+    {
+    theta1 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI;
+    theta2 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI; 
+    last_update_time+=state_update_interval;
+    ++count;
+    }
 
     joint_states_message.position = {theta1, theta2};
     joint_states_message.header.stamp = ros::Time::now();
@@ -38,7 +50,6 @@ int main(int argc, char **argv)
  
     ros::spinOnce();
     loop_rate.sleep();
-    ++count; 
   } 
   return 0;
 }
