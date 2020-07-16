@@ -15,8 +15,10 @@ int main(int argc, char **argv)
   int num_state_changes;
   nh.param("robot_joint_angles/num_state_changes", num_state_changes, 50);
  
-  int state_update_interval;
-  nh.param("robot_joint_angles/state_update_interval", state_update_interval, 3);
+  double state_update_interval_float;
+  nh.param("robot_joint_angles/state_update_interval", state_update_interval_float, 3.0);
+
+  ros::Duration state_update_interval_duration(state_update_interval_float);
   
   ros::Rate loop_rate(10);
 
@@ -27,7 +29,7 @@ int main(int argc, char **argv)
   double theta1 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
   double theta2 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
 
-  time_t last_update_time = time(0);
+  ros::Time last_update_time = ros::Time::now(); 
   
   while(ros::ok())
   {
@@ -35,12 +37,12 @@ int main(int argc, char **argv)
 
     joint_states_message.name = {"base_to_link_1","link_1_to_link_2"};
 
-    if(time(0) - last_update_time == state_update_interval && count < num_state_changes)
+    if(ros::Time::now() - last_update_time >= state_update_interval_duration && count < num_state_changes)
     {
-    theta1 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI;
-    theta2 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI; 
-    last_update_time+=state_update_interval;
-    ++count;
+      theta1 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI;
+      theta2 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI; 
+      last_update_time += state_update_interval_duration;
+      ++count;
     }
 
     joint_states_message.position = {theta1, theta2};

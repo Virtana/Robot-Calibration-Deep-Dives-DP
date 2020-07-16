@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   tf
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -86,7 +85,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robot_calibration
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs tf message_runtime
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs tf
   # DEPENDS system_lib
 )
 
