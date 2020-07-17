@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="opt/ros/melodic/share/xacro" name = "pino_first_try">
+<robot name = "pino_milestone1_robot">
 
   <material name="violet">
     <color rgba="0.5 0 1 1"/>

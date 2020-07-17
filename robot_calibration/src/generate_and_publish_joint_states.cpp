@@ -18,6 +18,12 @@ int main(int argc, char **argv)
   double state_update_interval_float;
   nh.param("robot_joint_angles/state_update_interval", state_update_interval_float, 3.0);
 
+  if(state_update_interval_float <= 0)
+  {
+    ROS_WARN("%s","Non-positive state update interval specified, interval updated to default.");
+    state_update_interval_float = 3.0;
+  }
+
   ros::Duration state_update_interval_duration(state_update_interval_float);
   
   ros::Rate loop_rate(10);
