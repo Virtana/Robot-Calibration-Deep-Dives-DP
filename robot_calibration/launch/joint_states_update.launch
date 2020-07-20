@@ -2,7 +2,7 @@
    <!-- Load the urdf into the parameter server. -->
    <param name="robot_description" command= "cat $(find robot_calibration)/urdf/simple_2link_arm.urdf"/>
    
-   <rosparam file="$(find robot_calibration)/yaml/message_parameters.yaml"/>
+   <rosparam file="$(find robot_calibration)/state_update_parameters/state_update_parameters.yaml"/>
     
    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
    <node name="simple_joint_state_pub_1" pkg="robot_calibration" type="simple_joint_state_pub" />
