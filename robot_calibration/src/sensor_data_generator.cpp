@@ -41,7 +41,7 @@ void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& ms
   yaml_out_stream << YAML::BeginSeq <<  ee_position[0] << ee_position[1] << YAML::EndSeq;
   yaml_out_stream << YAML::EndMap;
 
-  outfile.open("/home/jad/catkin_ws/src/Robot-Calibration-Deep-Dives-DP/robot_calibration/sensor_data/sensor_data" + this->timestamp + ".yaml", std::fstream::app);
+  outfile.open("/home/jad/catkin_ws/src/Robot-Calibration-Deep-Dives-DP/robot_calibration/sensor_data/sensor_data_" + this->timestamp + ".yaml", std::fstream::app);
   outfile << yaml_out_stream.c_str();
   outfile.close();
 
