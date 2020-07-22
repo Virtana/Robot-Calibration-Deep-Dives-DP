@@ -4,8 +4,15 @@
 #include "yaml-cpp/yaml.h"
 #include <fstream>
 
+class Listener
+{  
+  public:
+    void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
+    std::string timestamp = std::to_string(ros::Time::now().toSec());
+};
 
-void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg)
+
+void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg)
 {
   double angles[2];
   angles[0] = msg->position[0];
@@ -34,7 +41,7 @@ void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg)
   yaml_out_stream << YAML::BeginSeq <<  ee_position[0] << ee_position[1] << YAML::EndSeq;
   yaml_out_stream << YAML::EndMap;
 
-  outfile.open("/home/jad/catkin_ws/src/Robot-Calibration-Deep-Dives-DP/robot_calibration/sensor_data/sensor_data" + std::to_string(ros::Time::now().toSec()) + ".yaml", std::fstream::app);
+  outfile.open("/home/jad/catkin_ws/src/Robot-Calibration-Deep-Dives-DP/robot_calibration/sensor_data/sensor_data" + this->timestamp + ".yaml", std::fstream::app);
   outfile << yaml_out_stream.c_str();
   outfile.close();
 
@@ -47,7 +54,9 @@ int main(int argc, char** argv)
 
   ros::NodeHandle nh;
 
-  ros::Subscriber angles_subscriber = nh.subscribe("joint_states", 100, calculateAndWriteData);
+  Listener listener;
+
+  ros::Subscriber angles_subscriber = nh.subscribe("joint_states", 100, &Listener::calculateAndWriteData, &listener);
 
   ros::spin();
 
