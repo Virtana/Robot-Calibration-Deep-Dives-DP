@@ -1,17 +1,16 @@
 <launch>
    <!-- Load the urdf into the parameter server. -->
-   <param name="robot_description" command= "cat $(find robot_calibration)/urdf/simple_2link_arm.urdf"/>
-   
-   <rosparam file="$(find robot_calibration)/state_update_parameters/state_update_parameters.yaml"/>
+   <param name = "robot_description" command = "cat $(find robot_calibration)/urdf/simple_2link_arm.urdf" />
+
+   <param name = "theta_1_offset" type = "double" value = "0.044" />
+   <param name = "theta_2_offset" type = "double" value = "0.013" />
+
+   <rosparam file = "$(find robot_calibration)/config/2d_state_update_parameters.yaml" />
     
-   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
-<<<<<<< HEAD
-   <node name="simple_joint_state_pub_1" pkg="robot_calibration" type="simple_joint_state_pub"/>
-=======
-   <node name="simple_joint_state_pub_1" pkg="robot_calibration" type="simple_joint_state_pub" />
-   <node name="simple_joint_state_listener_1" pkg="robot_calibration" type="simple_joint_state_listener" />
->>>>>>> Reading sensor data, not yet finished
-   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find robot_calibration)/rviz/simple_joint_state.rviz"/>
+   <node pkg = "robot_state_publisher" type = "robot_state_publisher" name = "robot_state_publisher" />
+   <node name = "simple_joint_state_pub_1" pkg = "robot_calibration" type = "simple_joint_state_pub" />
+   <node name = "simple_joint_state_listener_1" pkg = "robot_calibration" type = "simple_joint_state_listener" />
+   <node type = "rviz" name = "rviz" pkg = "rviz" args = "-d $(find robot_calibration)/rviz/simple_joint_state.rviz" />
 
 </launch>
 

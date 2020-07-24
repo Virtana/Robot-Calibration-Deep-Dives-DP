@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 robot_joint_angles:
-  state_update_interval: 2
+  state_update_interval: 0.5
   num_state_changes: 25
 =======
 message_interval: 0.5

@@ -13,10 +13,12 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   tf
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
+##ceres hadda go here too
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -84,7 +86,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robot_calibration
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs tf
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs tf roslib
   # DEPENDS system_lib
 )
 
@@ -138,9 +140,12 @@ target_link_libraries(simple_joint_state_listener
   # ${PROJECT_NAME}
   -luuid
   yaml-cpp
+  # Boost
+  ${boost_LIBRARIES}
 )
 
 FIND_PACKAGE(yaml-cpp REQUIRED)
+FIND_PACKAGE(Boost REQUIRED)
 
 #############
 ## Install ##
