@@ -34,8 +34,8 @@ class Listener
     link_2_length = 1.0;
 
     //initial values of theta_1 and theta_2 before a joint state message has been received
-    theta_1 = 0;
-    theta_2 = 0;
+    theta_1 = 7;
+    theta_2 = 7;
 
     //initial ee_position calculated based on above joint angle values
     ee_position[0] = (link_1_length * cos(theta_1)) + (link_2_length * cos(theta_1 + theta_2));
