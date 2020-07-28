@@ -10,6 +10,7 @@
    <node pkg = "robot_state_publisher" type = "robot_state_publisher" name = "robot_state_publisher" />
    <node name = "simple_joint_state_pub_1" pkg = "robot_calibration" type = "simple_joint_state_pub" />
    <node name = "simple_joint_state_listener_1" pkg = "robot_calibration" type = "simple_joint_state_listener" />
+   <node name = "calibrator_1" pkg = "robot_calibration" type = "calibrator" />
    <node type = "rviz" name = "rviz" pkg = "rviz" args = "-d $(find robot_calibration)/rviz/simple_joint_state.rviz" />
 
 </launch>
