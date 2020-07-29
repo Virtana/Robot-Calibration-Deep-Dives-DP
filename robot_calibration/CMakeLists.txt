@@ -13,10 +13,12 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   tf
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
+find_package(Ceres REQUIRED)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -84,7 +86,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robot_calibration
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs tf
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs tf roslib
   # DEPENDS system_lib
 )
 
@@ -96,12 +98,14 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(include
   ${catkin_INCLUDE_DIRS}
+  ${CERES_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}
-  src/generate_and_publish_joint_states.cpp
-)
+# add_library(${PROJECT_NAME}
+#   src/generate_and_publish_joint_states.cpp
+#   src/sensor_data_generator.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -113,6 +117,8 @@ add_library(${PROJECT_NAME}
 ## The recommended prefix ensures that target names across packages don't collide
 
 add_executable(simple_joint_state_pub src/generate_and_publish_joint_states.cpp)
+add_executable(simple_joint_state_listener src/sensor_data_generator.cpp)
+#add_executable(calibrator src/calibration.cpp)
 
 ## Rename C++ executable without prefix 
 ## The above recommended prefix causes long target names, the following renames the
@@ -127,9 +133,31 @@ add_executable(simple_joint_state_pub src/generate_and_publish_joint_states.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(simple_joint_state_pub
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
+  # ${PROJECT_NAME}
   -luuid
 )
+
+target_link_libraries(simple_joint_state_listener
+  ${catkin_LIBRARIES}  
+  # ${PROJECT_NAME}
+  -luuid
+  yaml-cpp
+  ${boost_LIBRARIES}
+  #ceres
+  ${CERES_LIBRARIES}
+)
+
+# target_link_libraries(calibrator
+#   ${catkin_LIBRARIES}
+#   # ${PROJECT_NAME}
+#   -luuid
+#   yaml-cpp
+#   ${CERES_LIBRARIES}
+# )
+
+FIND_PACKAGE(yaml-cpp REQUIRED)
+FIND_PACKAGE(Boost REQUIRED)
+#FIND_PACKAGE(Ceres REQUIRED)
 
 #############
 ## Install ##
@@ -153,7 +181,7 @@ target_link_libraries(simple_joint_state_pub
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS # ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
