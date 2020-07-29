@@ -9,8 +9,9 @@
 //class to facilitate calculation and writing of data
 class Listener
 {
-  std::string filename;
-  double theta_1, theta_2, theta_1_offset, theta_2_offset, link_1_length, link_2_length, ee_position[2];
+  private:
+  std::string filename_;
+  double theta_1_, theta_2_, theta_1_offset_, theta_2_offset_, link_1_length_, link_2_length_, ee_position_[2];
   public:
   void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
   Listener(double theta_1_offset, double theta_2_offset)
