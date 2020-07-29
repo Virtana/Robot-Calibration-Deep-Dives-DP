@@ -8,8 +8,8 @@
 
 class Listener
 {
-  YAML::Emitter yaml_out_stream;
   public:
+    YAML::Emitter yaml_out_stream;
     void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
     std::string filename;
     double theta_1, theta_2, theta_1_offset, theta_2_offset;
@@ -98,11 +98,11 @@ int main(int argc, char** argv)
 
   ros::spin();
 
-  // listener.yaml_out_stream << YAML::EndSeq;
-  // std::ofstream outfile;
-  // outfile.open(listener.filename);
-  // outfile << listener.yaml_out_stream.c_str();
-  // outfile.close();
+  listener.yaml_out_stream << YAML::EndSeq;
+  std::ofstream outfile;
+  outfile.open(listener.filename);
+  outfile << listener.yaml_out_stream.c_str();
+  outfile.close();
 
   return 0;
 }
