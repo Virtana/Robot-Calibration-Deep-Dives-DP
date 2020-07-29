@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
-##ceres hadda go here too
+find_package(Ceres REQUIRED)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -98,6 +98,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(include
   ${catkin_INCLUDE_DIRS}
+  ${CERES_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -117,6 +118,7 @@ include_directories(include
 
 add_executable(simple_joint_state_pub src/generate_and_publish_joint_states.cpp)
 add_executable(simple_joint_state_listener src/sensor_data_generator.cpp)
+add_executable(calibrator src/calibration.cpp)
 
 ## Rename C++ executable without prefix 
 ## The above recommended prefix causes long target names, the following renames the
@@ -142,6 +144,14 @@ target_link_libraries(simple_joint_state_listener
   yaml-cpp
   # Boost
   ${boost_LIBRARIES}
+)
+
+target_link_libraries(calibrator
+  ${catkin_LIBRARIES}
+  # ${PROJECT_NAME}
+  -luuid
+  yaml-cpp
+  ${CERES_LIBRARIES}
 )
 
 FIND_PACKAGE(yaml-cpp REQUIRED)

@@ -34,7 +34,7 @@ int main(int argc, char **argv)
   
   double theta1 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
   double theta2 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
-
+  
   ros::Time last_update_time = ros::Time::now(); 
   
   while(ros::ok())
@@ -46,7 +46,8 @@ int main(int argc, char **argv)
     if(ros::Time::now() - last_update_time >= state_update_interval_duration && count < num_state_changes)
     {
       theta1 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI;
-      theta2 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI; 
+      theta2 = (((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI;
+      
       last_update_time += state_update_interval_duration;
       ++count;
     }

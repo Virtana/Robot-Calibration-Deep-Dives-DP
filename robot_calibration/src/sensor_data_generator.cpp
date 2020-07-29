@@ -8,6 +8,7 @@
 
 class Listener
 {
+  YAML::Emitter yaml_out_stream;
   public:
     void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
     std::string filename;
@@ -16,6 +17,7 @@ class Listener
     Listener(double t_1_offset, double t_2_offset)
     {
       filename = ros::package::getPath("robot_calibration");
+      this->yaml_out_stream << YAML::BeginSeq;
       if(filename != "")
       {
         filename += "/sensor_data";
@@ -49,36 +51,32 @@ void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& ms
   angles[0] += this->theta_1_offset; 
   angles[1] += this->theta_2_offset;  
 
+
   if(angles[0] != this->theta_1 || angles[1] != this->theta_2)
   {
     this->theta_1 = angles[0];
     this->theta_2 = angles[1];
 
-    YAML::Emitter yaml_out_stream;
-    std::ofstream outfile;
 
-    yaml_out_stream << YAML::Literal <<"\n";
-    yaml_out_stream << YAML::BeginMap;
-    yaml_out_stream << YAML::Key  << "Angles";
-    yaml_out_stream << YAML::Value;
-    yaml_out_stream << YAML::Flow;
-    yaml_out_stream << YAML::BeginSeq << angles[0] << angles[1] << YAML::EndSeq;
-    yaml_out_stream << YAML::Key  << "End Effector Position";
-    yaml_out_stream << YAML::Value;
-    yaml_out_stream << YAML::Flow;
-    yaml_out_stream << YAML::BeginSeq <<  ee_position[0] << ee_position[1] << YAML::EndSeq;
-    yaml_out_stream << YAML::EndMap;
+    this->yaml_out_stream << YAML::BeginMap;
+    this->yaml_out_stream << YAML::Key  << "Angles";
+    this->yaml_out_stream << YAML::Value;
+    this->yaml_out_stream << YAML::BeginSeq << angles[0] << angles[1] << YAML::EndSeq;
+    this->yaml_out_stream << YAML::Key  << "End Effector Position";
+    this->yaml_out_stream << YAML::Value;
+    this->yaml_out_stream << YAML::BeginSeq <<  ee_position[0] << ee_position[1] << YAML::EndSeq;
+    this->yaml_out_stream << YAML::EndMap;
 
-    if(filename == "")
-    {
-      ROS_WARN("%s","Could not locate package in attempting to save sensor data.");
-    }
-    else
-    {
-      outfile.open(filename, std::fstream::app);
-      outfile << yaml_out_stream.c_str();
-      outfile.close();
-    }   
+    // if(filename == "")
+    // {
+    //   ROS_WARN("%s","Could not locate package in attempting to save sensor data.");
+    // }
+    // else
+    // {
+    //   outfile.open(filename, std::fstream::app);
+    //   outfile << this->yaml_out_stream.c_str();
+    //   outfile.close();
+    // }   
   }
   return;
 }
@@ -99,6 +97,12 @@ int main(int argc, char** argv)
   ros::Subscriber angles_subscriber = nh.subscribe("joint_states", 10, &Listener::calculateAndWriteData, &listener);
 
   ros::spin();
+
+  // listener.yaml_out_stream << YAML::EndSeq;
+  // std::ofstream outfile;
+  // outfile.open(listener.filename);
+  // outfile << listener.yaml_out_stream.c_str();
+  // outfile.close();
 
   return 0;
 }
