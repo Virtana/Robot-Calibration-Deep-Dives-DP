@@ -32,10 +32,9 @@ int main(int argc, char **argv)
 
   srand(time(0));
   
-  // double theta1 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
-  // double theta2 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
-  double theta1 = -0.5;
-  double theta2 = -0.5;
+  double theta1 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
+  double theta2 = ((((rand() - double(RAND_MAX)/2) / double(RAND_MAX/2))) * 2*M_PI);
+  
   ros::Time last_update_time = ros::Time::now(); 
   
   while(ros::ok())
