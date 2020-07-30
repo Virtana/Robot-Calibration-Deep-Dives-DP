@@ -6,35 +6,6 @@
 #include <fstream>
 #include "boost/filesystem.hpp"
 
-<<<<<<< HEAD
-class Listener
-{
-  public:
-    YAML::Emitter yaml_out_stream;
-    void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
-    std::string filename;
-    double theta_1, theta_2, theta_1_offset, theta_2_offset;
-    double ee_position[2];
-    Listener(double t_1_offset, double t_2_offset)
-    {
-      filename = ros::package::getPath("robot_calibration");
-      this->yaml_out_stream << YAML::BeginSeq;
-      if(filename != "")
-      {
-        filename += "/sensor_data";
-        boost::filesystem::create_directory(filename);
-        filename += "/sensor_data_" + std::to_string((int)ros::Time::now().toSec()) + ".yaml";
-      }
-      theta_1 = -1.0;
-      theta_2 = -1.0;
-
-      ee_position[0] = 1000000000;
-      ee_position[1] = 1000000000;
-
-      theta_1_offset = t_1_offset;
-      theta_2_offset = t_2_offset;
-    }
-=======
 //class to facilitate calculation and writing of data
 class Listener
 {
@@ -76,53 +47,11 @@ class Listener
     this->theta_1_offset_ = theta_1_offset;
     this->theta_2_offset_ = theta_2_offset;
   }
->>>>>>> master
 };
 
 
 void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg)
 {
-<<<<<<< HEAD
-  double link_1_length, link_2_length;
-  link_1_length = 1.8;
-  link_2_length = 1.0;
-
-  double angles[2];
-  angles[0] = msg->position[0];
-  angles[1] = msg->position[1];
-
-  double ee_position[] = {(link_1_length * cos(angles[0])) + (link_2_length * cos(angles[0] + angles[1])) , (link_1_length * sin(angles[0])) + (link_2_length * sin(angles[0] + angles[1]))}; 
-  
-  angles[0] += this->theta_1_offset; 
-  angles[1] += this->theta_2_offset;  
-
-
-  if(angles[0] != this->theta_1 || angles[1] != this->theta_2)
-  {
-    this->theta_1 = angles[0];
-    this->theta_2 = angles[1];
-
-
-    this->yaml_out_stream << YAML::BeginMap;
-    this->yaml_out_stream << YAML::Key  << "Angles";
-    this->yaml_out_stream << YAML::Value;
-    this->yaml_out_stream << YAML::BeginSeq << angles[0] << angles[1] << YAML::EndSeq;
-    this->yaml_out_stream << YAML::Key  << "End Effector Position";
-    this->yaml_out_stream << YAML::Value;
-    this->yaml_out_stream << YAML::BeginSeq <<  ee_position[0] << ee_position[1] << YAML::EndSeq;
-    this->yaml_out_stream << YAML::EndMap;
-
-    // if(filename == "")
-    // {
-    //   ROS_WARN("%s","Could not locate package in attempting to save sensor data.");
-    // }
-    // else
-    // {
-    //   outfile.open(filename, std::fstream::app);
-    //   outfile << this->yaml_out_stream.c_str();
-    //   outfile.close();
-    // }   
-=======
   //receiving values of theta_1 and theta_2 sent from the generator/publisher node via /joint_states topic
   double theta_1_from_message = msg->position[0]; 
   double theta_2_from_message = msg->position[1];
@@ -159,7 +88,6 @@ void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& ms
     outfile << yaml_out_stream.c_str();
     outfile.close();
       
->>>>>>> master
   }
   return;
 }
@@ -171,14 +99,6 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
 
   double theta_1_offset, theta_2_offset;
-<<<<<<< HEAD
-
-  nh.getParam("/theta_1_offset", theta_1_offset);
-  nh.getParam("/theta_2_offset", theta_2_offset);
-
-  Listener listener(theta_1_offset, theta_2_offset);
-
-=======
   
   //retrieve offsets from parameter server, which are set via launch file
   nh.getParam("/theta_1_offset", theta_1_offset);
@@ -188,19 +108,9 @@ int main(int argc, char** argv)
   Listener listener(theta_1_offset, theta_2_offset);
 
   //make subscriber
->>>>>>> master
   ros::Subscriber angles_subscriber = nh.subscribe("joint_states", 10, &Listener::calculateAndWriteData, &listener);
 
   ros::spin();
 
-<<<<<<< HEAD
-  listener.yaml_out_stream << YAML::EndSeq;
-  std::ofstream outfile;
-  outfile.open(listener.filename);
-  outfile << listener.yaml_out_stream.c_str();
-  outfile.close();
-
-=======
->>>>>>> master
   return 0;
 }
