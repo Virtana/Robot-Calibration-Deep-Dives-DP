@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   std::string filename;
   nh.getParam("/calibrator/filename", filename);
 
-  if(filepath != "")
+  if (filepath != "")
   {
     filepath = filepath + "/sensor_data/" + filename;
   }
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   {
     ros::shutdown();
   }
-  
+
   // loading yaml file
   YAML::Node yaml_node = YAML::LoadFile(filepath);
 
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
   ceres::Solve(options, &problem, &summary);
 
   // print final output
-  //offsets are negated so that final answer reflects offset applied, rather than offset needed to correct sensor
+  // offsets are negated so that final answer reflects offset applied, rather than offset needed to correct sensor
   std::cout << summary.BriefReport() << std::endl;
   std::cout << "Initial o1: " << 0.0 << " o2: " << 0.0 << "\n";
   std::cout << "Final   o1: " << -offset_1 << " o2: " << -offset_2 << "\n";
