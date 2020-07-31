@@ -5,6 +5,7 @@
 #include "yaml-cpp/yaml.h"
 #include <fstream>
 #include "boost/filesystem.hpp"
+#include <iostream>
 
 // class to facilitate calculation and writing of data
 class Listener
