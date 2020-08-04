@@ -13,7 +13,7 @@ class Listener
 private:
   std::string filename_;
   double theta_1_, theta_2_, theta_1_offset_, theta_2_offset_, link_1_length_, link_2_length_, ee_position_[2];
-  YAML::Emitter yaml_out_stream;
+  YAML::Emitter yaml_out_stream_;
 
 public:
   void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
@@ -34,8 +34,8 @@ public:
       ros::shutdown();
     }
 
-    //begin sequence to store all data in yaml file
-    yaml_out_stream << YAML::BeginSeq;
+    // begin sequence to store all data in yaml file
+    yaml_out_stream_ << YAML::BeginSeq;
 
     // link lengths hardcoded
     link_1_length_ = 1.8;
@@ -57,14 +57,16 @@ public:
   }
 };
 
-//function to take final YAML outstream and write to file
+// function to take final YAML outstream and write to file
+// current approach is to build up data in YAML outstream, and write to file all at once at end of program
+// downside is that for very large files, all data will have to be stored in memory before the write is performed
 void Listener::finalWrite()
 {
-  this->yaml_out_stream << YAML::EndSeq;
+  this->yaml_out_stream_ << YAML::EndSeq;
 
   std::ofstream outfile;
   outfile.open(this->filename_);
-  outfile << this->yaml_out_stream.c_str();
+  outfile << this->yaml_out_stream_.c_str();
   outfile.close();
 }
 
@@ -90,15 +92,14 @@ void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& ms
     this->theta_2_ = theta_2_from_message + this->theta_2_offset_;
 
     // update YAML out stream with offset angles and true ee position
-    this->yaml_out_stream << YAML::BeginMap;
-    this->yaml_out_stream << YAML::Key << "Angles";
-    this->yaml_out_stream << YAML::Value;
-    this->yaml_out_stream << YAML::BeginSeq << this->theta_1_ << this->theta_2_ << YAML::EndSeq;
-    this->yaml_out_stream << YAML::Key << "End Effector Position";
-    this->yaml_out_stream << YAML::Value;
-    this->yaml_out_stream << YAML::BeginSeq << ee_position[0] << ee_position[1] << YAML::EndSeq;
-    this->yaml_out_stream << YAML::EndMap;
-
+    this->yaml_out_stream_ << YAML::BeginMap;
+    this->yaml_out_stream_ << YAML::Key << "Angles";
+    this->yaml_out_stream_ << YAML::Value;
+    this->yaml_out_stream_ << YAML::BeginSeq << this->theta_1_ << this->theta_2_ << YAML::EndSeq;
+    this->yaml_out_stream_ << YAML::Key << "End Effector Position";
+    this->yaml_out_stream_ << YAML::Value;
+    this->yaml_out_stream_ << YAML::BeginSeq << ee_position[0] << ee_position[1] << YAML::EndSeq;
+    this->yaml_out_stream_ << YAML::EndMap;
   }
   return;
 }
@@ -123,7 +124,7 @@ int main(int argc, char** argv)
 
   ros::spin();
 
-  //perform actual write once messages are no longer being received
+  // perform actual write once messages are no longer being received
   listener.finalWrite();
 
   return 0;

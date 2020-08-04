@@ -142,7 +142,6 @@ target_link_libraries(simple_joint_state_listener
   # ${PROJECT_NAME}
   -luuid
   yaml-cpp
-  # Boost
   ${boost_LIBRARIES}
 )
 
