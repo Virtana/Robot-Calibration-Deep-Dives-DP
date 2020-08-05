@@ -1,13 +1,11 @@
 #include "robot_calibration_3d/joint_state_publisher.h"
 
-namespace joint_state_publisher
-{
 JointStatePublisher::JointStatePublisher(ros::NodeHandle nh) : nh_(nh)
 {
-  // currently hardcoding this, should be obtained from URDF
+  // TODO: retrieve this value from the URDF rather than hardcode
   num_joints_ = 6;
 
-  // getting publisher
+  // initialising publisher
   joint_states_pub_ = nh_.advertise<sensor_msgs::JointState>("joint_states", 20);
 
   // retrieving state update parameters from param server
@@ -17,7 +15,8 @@ JointStatePublisher::JointStatePublisher(ros::NodeHandle nh) : nh_(nh)
   // ensure the update interval is positive
   if (state_update_interval_float_ <= 0)
   {
-    ROS_WARN("%s", "Non-positive state update interval specified, interval updated to default.");
+    ROS_WARN("Non-positive state update interval specified (%f), interval updated to default (%f).",
+             state_update_interval_float_, 3.0);
     state_update_interval_float_ = 3.0;
   }
 
@@ -32,20 +31,13 @@ JointStatePublisher::JointStatePublisher(ros::NodeHandle nh) : nh_(nh)
 
   // populate the joint name array of the message, assuming the URDF uses the naming convention that the ith joint is
   // named "joint_i"
+  // TODO: retrieve joint names directly from URDF, rather than assume the naming convention used below
   for (int i = 1; i <= num_joints_; i++)
     joint_states_message_.name.push_back("joint_" + std::to_string(i));
 
   // initialise the joint state array of the message with random values for first update
-  // curently it is hardcoded to account for the unique limits of rotation of each joint
-  joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-2.9671, 2.9671));
-  joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-1.0472, 2.4435));
-  joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-2.4784, 4.0143));
-  joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-3.3161, 3.3161));
-  joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-2.0944, 2.0944));
-  joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-6.2832, 6.2832));
-  // for (int i = 0; i < num_joints_; i++)
-  //   joint_states_message_.position.push_back(((((rand() - double(RAND_MAX) / 2) / double(RAND_MAX / 2))) * 2 *
-  //   M_PI));
+  // TODO: retrieve angle limits from URDF, rather than hardcoding limits as is done in this function
+  updateJointStateMessage(&joint_states_message_);
 
   // set time of update after this first update
   ros::Time last_update_time = ros::Time::now();
@@ -64,16 +56,8 @@ JointStatePublisher::JointStatePublisher(ros::NodeHandle nh) : nh_(nh)
                                            joint_states_message_.position.end());
 
       // fill array with 6 new random angles
-      // curently it is hardcoded to account for the unique limits of rotation of each joint
-      joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-2.9671, 2.9671));
-      joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-1.0472, 2.4435));
-      joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-2.4784, 4.0143));
-      joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-3.3161, 3.3161));
-      joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-2.0944, 2.0944));
-      joint_states_message_.position.push_back(joint_state_publisher::randomAngle(-6.2832, 6.2832));
-      // for (int i = 0; i < num_joints_; i++)
-      //   joint_states_message_.position.push_back(
-      //       ((((rand() - double(RAND_MAX) / 2) / double(RAND_MAX / 2))) * 2 * M_PI));
+      // TODO: retrieve angle limits from URDF, rather than hardcoding limits as is done in this function
+      updateJointStateMessage(&joint_states_message_);
 
       // update the time of last update, as well as update count
       last_update_time += state_update_interval_duration;
@@ -98,4 +82,14 @@ double randomAngle(double lower_limit, double upper_limit)
   return lower_limit + (double(rand()) / double(RAND_MAX)) * (upper_limit - lower_limit);
 }
 
-}  // namespace joint_state_publisher
+// function to update all joint state positions
+// TODO: retrieve limits of rotation from URDF, rather than hardcoding
+void updateJointStateMessage(sensor_msgs::JointState* msg)
+{
+  msg->position.push_back(randomAngle(-2.9671, 2.9671));
+  msg->position.push_back(randomAngle(-1.0472, 2.4435));
+  msg->position.push_back(randomAngle(-2.4784, 4.0143));
+  msg->position.push_back(randomAngle(-3.3161, 3.3161));
+  msg->position.push_back(randomAngle(-2.0944, 2.0944));
+  msg->position.push_back(randomAngle(-6.2832, 6.2832));
+}

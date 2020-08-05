@@ -8,7 +8,7 @@ int main(int argc, char** argv)
   // NodeHandle to be passed to JointStatePublisher
   ros::NodeHandle nh;
 
-  joint_state_publisher::JointStatePublisher joint_state_publisher(nh);
+  JointStatePublisher joint_state_publisher(nh);
 
   return 0;
 }

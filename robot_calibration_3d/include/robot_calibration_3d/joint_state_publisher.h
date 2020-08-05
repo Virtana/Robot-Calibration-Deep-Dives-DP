@@ -1,10 +1,11 @@
+#ifndef ROBOT_CALIBRATION_3D_JOINT_STATE_PUBLISHER_H_
+#define ROBOT_CALIBRATION_3D_JOINT_STATE_PUBLISHER_H_
+
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
 #include "time.h"
 #include "cmath"
 
-namespace joint_state_publisher
-{
 class JointStatePublisher
 {
   // constructor takes a NodeHandle as its sole argument
@@ -15,7 +16,7 @@ private:
   ros::NodeHandle nh_;
   // publisher to do actual publishing will be obtained via the NodeHandle in the constructor
   ros::Publisher joint_states_pub_;
-  // number of joints in robot, is retrieved from URDF in constructor
+  // TODO: Retrieve this number from the URDF in constructor, instead of hardcoding.
   int num_joints_;
   // parameters to govern state updates, retrieved from param server in constructor
   int num_state_changes_;
@@ -26,5 +27,6 @@ private:
 
 // simple function to get random angle within supplied limits
 double randomAngle(double lower_limit, double upper_limit);
+void updateJointStateMessage(sensor_msgs::JointState* msg);
 
-}  // namespace joint_state_publisher
+#endif  
