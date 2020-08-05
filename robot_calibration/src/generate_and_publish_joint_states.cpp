@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
   double theta1 = ((((rand() - double(RAND_MAX) / 2) / double(RAND_MAX / 2))) * 2 * M_PI);
   double theta2 = ((((rand() - double(RAND_MAX) / 2) / double(RAND_MAX / 2))) * 2 * M_PI);
-
+  
   ros::Time last_update_time = ros::Time::now();
 
   while (ros::ok())

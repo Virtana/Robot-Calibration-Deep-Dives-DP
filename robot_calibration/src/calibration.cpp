@@ -110,8 +110,8 @@ int main(int argc, char** argv)
   // print final output
   // offsets are negated so that final answer reflects offset applied, rather than offset needed to correct sensor
   std::cout << summary.BriefReport() << std::endl;
-  std::cout << "Initial o1: " << 0.0 << " o2: " << 0.0 << "\n";
-  std::cout << "Final   o1: " << -offset_1 << " o2: " << -offset_2 << "\n";
+  std::cout << "Initial offset1: " << 0.0 << " offset2: " << 0.0 << "\n";
+  std::cout << "Final   offset1: " << -offset_1 << " offset2: " << -offset_2 << "\n";
 
   return 0;
 }
