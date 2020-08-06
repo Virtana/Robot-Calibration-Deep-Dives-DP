@@ -20,12 +20,6 @@ JointStatePublisher::JointStatePublisher(ros::NodeHandle nh) : nh_(nh)
     state_update_interval_float_ = 3.0;
   }
 
-  // getting update interval as a ros::Duration rather than a double eases calculation
-  ros::Duration state_update_interval_duration(state_update_interval_float_);
-
-  // set rate at which messages are sent, regardless of when state is updated
-  ros::Rate loop_rate_(10);
-
   // seed number generator to ensure randomness
   srand(time(0));
 
@@ -37,59 +31,58 @@ JointStatePublisher::JointStatePublisher(ros::NodeHandle nh) : nh_(nh)
 
   // initialise the joint state array of the message with random values for first update
   // TODO: retrieve angle limits from URDF, rather than hardcoding limits as is done in this function
-  updateJointStateMessage(&joint_states_message_);
+  updateJointStateMessage();
 
-  // set time of update after this first update
-  ros::Time last_update_time = ros::Time::now();
-
-  // start counting updates
-  int count = 1;
-
-  while (ros::ok())
-  {
-    // if enough time has passed since last update and number of desired state changes has not yet been met, update
-    // state of robot
-    if (ros::Time::now() - last_update_time >= state_update_interval_duration && count < num_state_changes_)
-    {
-      // clearing joint state array (actually a vector) to facilitate the pushing of 6 new angles
-      joint_states_message_.position.erase(joint_states_message_.position.begin(),
-                                           joint_states_message_.position.end());
-
-      // fill array with 6 new random angles
-      // TODO: retrieve angle limits from URDF, rather than hardcoding limits as is done in this function
-      updateJointStateMessage(&joint_states_message_);
-
-      // update the time of last update, as well as update count
-      last_update_time += state_update_interval_duration;
-      ++count;
-    }
-
-    // timestamp the message
-    joint_states_message_.header.stamp = ros::Time::now();
-
-    // actual publishing
-    joint_states_pub_.publish(joint_states_message_);
-
-    // wait a certan amount of time (determined by loop rate) before sending another message
-    ros::spinOnce();
-    loop_rate_.sleep();
-  }
+  // set time of last update, after this first update
+  last_update_time_ = ros::Time::now();
 }
 
 // simple function to get random angle within supplied limits
-double randomAngle(double lower_limit, double upper_limit)
+double JointStatePublisher::randomAngle(double lower_limit, double upper_limit)
 {
   return lower_limit + (double(rand()) / double(RAND_MAX)) * (upper_limit - lower_limit);
 }
 
 // function to update all joint state positions
 // TODO: retrieve limits of rotation from URDF, rather than hardcoding
-void updateJointStateMessage(sensor_msgs::JointState* msg)
+void JointStatePublisher::updateJointStateMessage()
 {
-  msg->position.push_back(randomAngle(-2.9671, 2.9671));
-  msg->position.push_back(randomAngle(-1.0472, 2.4435));
-  msg->position.push_back(randomAngle(-2.4784, 4.0143));
-  msg->position.push_back(randomAngle(-3.3161, 3.3161));
-  msg->position.push_back(randomAngle(-2.0944, 2.0944));
-  msg->position.push_back(randomAngle(-6.2832, 6.2832));
+  // clearing joint state array (actually a vector) to facilitate the pushing of 6 new angles
+  joint_states_message_.position.erase(joint_states_message_.position.begin(), joint_states_message_.position.end());
+
+  joint_states_message_.position.push_back(randomAngle(-2.9671, 2.9671));
+  joint_states_message_.position.push_back(randomAngle(-1.0472, 2.4435));
+  joint_states_message_.position.push_back(randomAngle(-2.4784, 4.0143));
+  joint_states_message_.position.push_back(randomAngle(-3.3161, 3.3161));
+  joint_states_message_.position.push_back(randomAngle(-2.0944, 2.0944));
+  joint_states_message_.position.push_back(randomAngle(-6.2832, 6.2832));
+
+  // timestamp the message
+  joint_states_message_.header.stamp = ros::Time::now();
+
+  return;
+}
+
+int JointStatePublisher::publishJointStateMessage(int count)
+{
+  // getting update interval as a ros::Duration rather than a double eases calculation
+  ros::Duration state_update_interval_duration(state_update_interval_float_);
+
+  // if enough time has passed since last update and number of desired state changes has not yet been met, update
+  // state of robot
+  if (ros::Time::now() - last_update_time_ >= state_update_interval_duration && count < num_state_changes_)
+  {
+    // fill array with 6 new random angles
+    // TODO: retrieve angle limits from URDF, rather than hardcoding limits as is done in this function
+    updateJointStateMessage();
+
+    // update the time of last update, as well as update count
+    last_update_time_ += state_update_interval_duration;
+
+    // update count to return
+    count++;
+  }
+  // actual publishing
+  joint_states_pub_.publish(joint_states_message_);
+  return count;
 }

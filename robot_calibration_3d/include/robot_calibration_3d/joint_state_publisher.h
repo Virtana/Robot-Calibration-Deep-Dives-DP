@@ -8,25 +8,36 @@
 
 class JointStatePublisher
 {
-  // constructor takes a NodeHandle as its sole argument
 public:
+  // constructor takes a NodeHandle as its sole argument
   JointStatePublisher(ros::NodeHandle nh);
+  // used to perform actual publishing of message
+  int publishJointStateMessage(int count);
 
 private:
   ros::NodeHandle nh_;
+
   // publisher to do actual publishing will be obtained via the NodeHandle in the constructor
   ros::Publisher joint_states_pub_;
-  // TODO: Retrieve this number from the URDF in constructor, instead of hardcoding.
+
+  // TODO: Retrieve this number from the URDF in constructor, instead of hardcoding in constructor
   int num_joints_;
+
   // parameters to govern state updates, retrieved from param server in constructor
   int num_state_changes_;
   double state_update_interval_float_;
+
+  // time of last joint update
+  ros::Time last_update_time_;
+
   // message to be modified at every state update and sent to /joint_states
   sensor_msgs::JointState joint_states_message_;
+
+  // simple function to get random angle within supplied limits
+  double randomAngle(double lower_limit, double upper_limit);
+
+  // function to update joint state message before it is published
+  void updateJointStateMessage();
 };
 
-// simple function to get random angle within supplied limits
-double randomAngle(double lower_limit, double upper_limit);
-void updateJointStateMessage(sensor_msgs::JointState* msg);
-
-#endif  
+#endif
