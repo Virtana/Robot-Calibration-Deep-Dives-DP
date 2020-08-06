@@ -118,7 +118,7 @@ include_directories(include
 
 add_executable(simple_joint_state_pub src/generate_and_publish_joint_states.cpp)
 add_executable(simple_joint_state_listener src/sensor_data_generator.cpp)
-#add_executable(calibrator src/calibration.cpp)
+add_executable(calibrator src/calibration.cpp)
 
 ## Rename C++ executable without prefix 
 ## The above recommended prefix causes long target names, the following renames the
@@ -138,26 +138,23 @@ target_link_libraries(simple_joint_state_pub
 )
 
 target_link_libraries(simple_joint_state_listener
-  ${catkin_LIBRARIES}  
+  ${catkin_LIBRARIES}
   # ${PROJECT_NAME}
   -luuid
   yaml-cpp
   ${boost_LIBRARIES}
-  #ceres
+)
+
+target_link_libraries(calibrator
+  ${catkin_LIBRARIES}
+  # ${PROJECT_NAME}
+  -luuid
+  yaml-cpp
   ${CERES_LIBRARIES}
 )
 
-# target_link_libraries(calibrator
-#   ${catkin_LIBRARIES}
-#   # ${PROJECT_NAME}
-#   -luuid
-#   yaml-cpp
-#   ${CERES_LIBRARIES}
-# )
-
 FIND_PACKAGE(yaml-cpp REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
-#FIND_PACKAGE(Ceres REQUIRED)
 
 #############
 ## Install ##

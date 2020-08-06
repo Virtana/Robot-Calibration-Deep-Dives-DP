@@ -5,21 +5,25 @@
 #include "yaml-cpp/yaml.h"
 #include <fstream>
 #include "boost/filesystem.hpp"
+#include <iostream>
 
-//class to facilitate calculation and writing of data
+// class to facilitate calculation and writing of data
 class Listener
 {
-  private:
+private:
   std::string filename_;
   double theta_1_, theta_2_, theta_1_offset_, theta_2_offset_, link_1_length_, link_2_length_, ee_position_[2];
-  public:
+  YAML::Emitter yaml_out_stream_;
+
+public:
   void calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg);
+  void finalWrite();
   Listener(double theta_1_offset, double theta_2_offset)
   {
     filename_ = ros::package::getPath("robot_calibration");
 
-    //if package could not be found, filename will be empty and the node will shutdown
-    if(filename_ != "")
+    // if package could not be found, filename will be empty and the node will shutdown
+    if (filename_ != "")
     {
       filename_ += "/sensor_data";
       boost::filesystem::create_directory(filename_);
@@ -29,88 +33,99 @@ class Listener
     {
       ros::shutdown();
     }
-    
-    //link lengths hardcoded
+
+    // begin sequence to store all data in yaml file
+    yaml_out_stream_ << YAML::BeginSeq;
+
+    // link lengths hardcoded
     link_1_length_ = 1.8;
     link_2_length_ = 1.0;
 
-    //initial values of theta_1_ and theta_2_ before a joint state message has been received
-    //made to be impossible values so that a "change" in joint state is detected and the angles from the very first message can be written
+    // initial values of theta_1_ and theta_2_ before a joint state message has been received
+    // made to be impossible values so that a "change" in joint state is detected and the angles from the very first
+    // message can be written
     theta_1_ = DBL_MAX;
     theta_2_ = DBL_MAX;
 
-    //initial ee_position calculated based on above joint angle values
+    // initial ee_position calculated based on above joint angle values
     ee_position_[0] = (link_1_length_ * cos(theta_1_)) + (link_2_length_ * cos(theta_1_ + theta_2_));
     ee_position_[1] = (link_1_length_ * sin(theta_1_)) + (link_2_length_ * sin(theta_1_ + theta_2_));
 
-    //setting the angle offsets which are supplied to class as parameters on creation
+    // setting the angle offsets which are supplied to class as parameters on creation
     this->theta_1_offset_ = theta_1_offset;
     this->theta_2_offset_ = theta_2_offset;
   }
 };
 
+// function to take final YAML outstream and write to file
+// current approach is to build up data in YAML outstream, and write to file all at once at end of program
+// downside is that for very large files, all data will have to be stored in memory before the write is performed
+void Listener::finalWrite()
+{
+  this->yaml_out_stream_ << YAML::EndSeq;
+
+  std::ofstream outfile;
+  outfile.open(this->filename_);
+  outfile << this->yaml_out_stream_.c_str();
+  outfile.close();
+}
 
 void Listener::calculateAndWriteData(const sensor_msgs::JointState::ConstPtr& msg)
 {
-  //receiving values of theta_1 and theta_2 sent from the generator/publisher node via /joint_states topic
-  double theta_1_from_message = msg->position[0]; 
+  // receiving values of theta_1 and theta_2 sent from the generator/publisher node via /joint_states topic
+  double theta_1_from_message = msg->position[0];
   double theta_2_from_message = msg->position[1];
 
-  //check if joint state has actually been changed (if class member variables differ from the angles sent via message (class member variable would have offset applied))
-  if(this->theta_1_ != theta_1_from_message + this->theta_1_offset_ || this->theta_2_ != theta_2_from_message + this->theta_2_offset_)
+  // check if joint state has actually been changed (if class member variables differ from the angles sent via message
+  // (class member variable would have offset applied))
+  if (this->theta_1_ != theta_1_from_message + this->theta_1_offset_ ||
+      this->theta_2_ != theta_2_from_message + this->theta_2_offset_)
   {
+    // calculate new end effector position with new angles
+    double ee_position[] = { (this->link_1_length_ * cos(theta_1_from_message)) +
+                                 (this->link_2_length_ * cos(theta_1_from_message + theta_2_from_message)),
+                             (this->link_1_length_ * sin(theta_1_from_message)) +
+                                 (this->link_2_length_ * sin(theta_1_from_message + theta_2_from_message)) };
 
-    //calculate new end effector position with new angles
-    double ee_position[] = {(this->link_1_length_ * cos(theta_1_from_message)) + (this->link_2_length_ * cos(theta_1_from_message + theta_2_from_message )) , (this->link_1_length_ * sin(theta_1_from_message)) + (this->link_2_length_ * sin(theta_1_from_message + theta_2_from_message ))};  
-    
-    //update class variables before writing to file
+    // update class variables (with offset) before writing to file
     this->theta_1_ = theta_1_from_message + this->theta_1_offset_;
     this->theta_2_ = theta_2_from_message + this->theta_2_offset_;
-    
-    //write the offset angles and the true end effector position to file
-    YAML::Emitter yaml_out_stream;
-    std::ofstream outfile;
 
-    yaml_out_stream << YAML::Literal <<"\n";
-    yaml_out_stream << YAML::BeginMap;
-    yaml_out_stream << YAML::Key  << "Angles";
-    yaml_out_stream << YAML::Value;
-    yaml_out_stream << YAML::Flow;
-    yaml_out_stream << YAML::BeginSeq << this->theta_1_ << this->theta_2_ << YAML::EndSeq;
-    yaml_out_stream << YAML::Key  << "End Effector Position";
-    yaml_out_stream << YAML::Value;
-    yaml_out_stream << YAML::Flow;
-    yaml_out_stream << YAML::BeginSeq <<  ee_position[0] << ee_position[1] << YAML::EndSeq;
-    yaml_out_stream << YAML::EndMap;
-
-
-    outfile.open(filename_, std::fstream::app);
-    outfile << yaml_out_stream.c_str();
-    outfile.close();
-      
+    // update YAML out stream with offset angles and true ee position
+    this->yaml_out_stream_ << YAML::BeginMap;
+    this->yaml_out_stream_ << YAML::Key << "Angles";
+    this->yaml_out_stream_ << YAML::Value;
+    this->yaml_out_stream_ << YAML::BeginSeq << this->theta_1_ << this->theta_2_ << YAML::EndSeq;
+    this->yaml_out_stream_ << YAML::Key << "End Effector Position";
+    this->yaml_out_stream_ << YAML::Value;
+    this->yaml_out_stream_ << YAML::BeginSeq << ee_position[0] << ee_position[1] << YAML::EndSeq;
+    this->yaml_out_stream_ << YAML::EndMap;
   }
   return;
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "simple_joint_state_listener"); 
+  ros::init(argc, argv, "simple_joint_state_listener");
 
   ros::NodeHandle nh;
 
   double theta_1_offset, theta_2_offset;
-  
-  //retrieve offsets from parameter server, which are set via launch file
+
+  // retrieve offsets from parameter server, which are set via launch file
   nh.getParam("/theta_1_offset", theta_1_offset);
   nh.getParam("/theta_2_offset", theta_2_offset);
 
-  //initialise listener class with offsets as parameters
+  // initialise listener class with offsets as parameters
   Listener listener(theta_1_offset, theta_2_offset);
 
-  //make subscriber
+  // make subscriber
   ros::Subscriber angles_subscriber = nh.subscribe("joint_states", 10, &Listener::calculateAndWriteData, &listener);
 
   ros::spin();
+
+  // perform actual write once messages are no longer being received
+  listener.finalWrite();
 
   return 0;
 }

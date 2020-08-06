@@ -2,8 +2,8 @@
    <!-- Load the urdf into the parameter server. -->
    <param name = "robot_description" command = "cat $(find robot_calibration)/urdf/simple_2link_arm.urdf" />
 
-   <param name = "theta_1_offset" type = "double" value = "0.044" />
-   <param name = "theta_2_offset" type = "double" value = "0.013" />
+   <param name = "theta_1_offset" type = "double" value = "0.069" />
+   <param name = "theta_2_offset" type = "double" value = "0.069" />
 
    <rosparam file = "$(find robot_calibration)/config/2d_state_update_parameters.yaml" />
     
