@@ -58,6 +58,7 @@ int main(int argc, char** argv)
   }
   else
   {
+    ROS_ERROR("Could not find package, shutting down node.");
     ros::shutdown();
   }
 
