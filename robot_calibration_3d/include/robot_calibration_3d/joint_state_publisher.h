@@ -12,7 +12,7 @@ public:
   // constructor takes a NodeHandle as its sole argument
   JointStatePublisher(ros::NodeHandle nh);
   // used to perform actual publishing of message
-  int publishJointStateMessage(int count);
+  void publishJointStateMessage();
 
 private:
   ros::NodeHandle nh_;
@@ -26,6 +26,9 @@ private:
   // parameters to govern state updates, retrieved from param server in constructor
   int num_state_changes_;
   double state_update_interval_float_;
+
+  // keep track of how many messages have been sent
+  int count_;
 
   // time of last joint update
   ros::Time last_update_time_;

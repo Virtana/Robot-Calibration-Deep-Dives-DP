@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
-  <xacro:include filename="$(find fanuc_resources)/urdf/common_colours.xacro"/>
+  <xacro:include filename="$(find robot_calibration_3d)/urdf/common_colours.xacro"/>
 
   <xacro:macro name="material_fanuc_yellow">
     <material name="">

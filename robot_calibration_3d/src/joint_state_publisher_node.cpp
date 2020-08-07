@@ -13,12 +13,9 @@ int main(int argc, char** argv)
   // rate at which messages are sent, regardless of when state is updated, set to 10 Hertz
   ros::Rate loop_rate(10);
 
-  // start counting updates
-  int count = 0;
-
   while (ros::ok())
   {
-    count = joint_state_publisher.publishJointStateMessage(count);
+    joint_state_publisher.publishJointStateMessage();
   }
 
   // wait a certan amount of time (determined by loop rate) before sending another message
