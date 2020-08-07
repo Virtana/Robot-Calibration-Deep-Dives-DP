@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<!--This file as well as dependencies were obtained from the ros-industrial repo, linked below. -->
+<!-- https://github.com/ros-industrial/fanuc/blob/indigo-devel/fanuc_lrmate200ic_support/urdf/lrmate200ic.xacro -->
+<robot name="fanuc_lrmate200ic" xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:include filename="$(find robot_calibration_3d)/urdf/lrmate200ic_macro.xacro"/>
+  <xacro:fanuc_lrmate200ic prefix=""/>
+</robot>
